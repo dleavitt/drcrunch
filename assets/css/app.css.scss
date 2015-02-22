@@ -1,0 +1,40 @@
+$icon-font-path: "bootstrap-sass/assets/fonts/bootstrap/";
+@import "bootstrap-sass/assets/stylesheets/_bootstrap-sprockets";
+@import "bootstrap-sass/assets/stylesheets/_bootstrap";
+
+body {
+  padding-top: 50px;
+}
+
+.file-drop {
+  width: 100%;
+  padding: 1rem 0 2.5rem 0;
+  border: 2px dashed;
+  border-radius: 12px;
+
+  text-align: center;
+  font-size: 8rem;
+  font-weight: bold;
+
+  &.hover {
+    border-color: $link-color;
+    color: $link-color;
+  }
+}
+
+.compression-form {
+  input[type=range] {
+    width: 200px;
+  }
+}
+
+.image-container {
+  max-height: 40rem;
+  overflow: auto;
+  background: $gray-darker;
+  text-align: center
+}
+
+.global-controls {
+  margin-top: 4em;
+}

@@ -1,0 +1,13 @@
+/node_modules/
+.DS_Store
+Thumbs.db
+.idea
+/log/newrelic_agent.log
+/.sass-cache
+/.env
+
+/.vagrant/
+
+/tmp/
+/docs/
+/vendor/assets/bower_components/

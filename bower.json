@@ -1,0 +1,25 @@
+{
+  "name": "drcrunch",
+  "version": "0.0.0",
+  "authors": [
+    "asdf"
+  ],
+  "license": "asdf",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-sass": "~3.3.3",
+    "angular": "~1.3.13",
+    "angular-ui-bootstrap-bower": "~0.12.1",
+    "ng-file-upload": "~3.0.7"
+  },
+  "resolutions": {
+    "angular": ">=1 <1.3.0"
+  }
+}
