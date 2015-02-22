@@ -9,42 +9,103 @@
     <%= stylesheet_tag 'app' %>
   </head>
   <body ng-controller="AppCtrl">
-    <nav class="navbar navbar-inverse navbar-fixed-top">
+    <nav class="navbar navbar-inverse navbar-static-top">
       <div class="container">
         <div class="navbar-header">
-          <a class="navbar-brand" href="#">DrCrunch</a>
+          <a href="#"  id="forceps">
+            <img alt="DrCrunch" src="<%= image_path('forceps.svg') %>">
+          </a>
+          <a id="title" class="navbar-brand" href="#">DrCrunch</a>
         </div>
       </div>
     </nav>
 
     <div class="jumbotron">
-      <div class="container">        
-        <div ng-file-drop ng-file-select ng-model="files" ng-multiple="true" drag-over-class="hover" accept=".jpg,.png,.pdf" class="file-drop">+</div>
+      <div class="container">
+        <div ng-file-drop ng-file-select ng-model="files" ng-multiple="true" drag-over-class="hover" accept=".jpg,.png,.gif,.jpeg" class="file-drop">+</div>
       </div>
     </div>
 
     <div class="container">
       <div class="row">
-        <div class="col-sm-12 form-inline compression-form">
-          <h3>Pngquant</h3>
-          <div class="form-group">
-            <label>
-              Minimum Quality
-              <input ng-model="compression.pngquant.quality_min" type="range" min="0" max="100" >
-            </label>
-          </div>
-          <div class="form-group">
-            <input type="text" readonly ng-model="compression.pngquant.quality_min" class="form-control" style="width: 50px;">
-          </div>
+        <div class="col-sm-12">
+          <form class="form-inline compression-form">
+            
+            <compression-group name="advpng" ng-model="compression.advpng">
+              <slider ng-model="compression.advpng.level" range="compressionOptions.advpng.level" name="Level"></slider>
+            </compression-group>
 
-          <div class="form-group">
-            <label>
-              Maximum Quality
-              <input ng-model="compression.pngquant.quality_max" type="range" min="0" max="100" >
-            </label>
-          </div>
-          <div class="form-group">
-            <input type="text" readonly ng-model="compression.pngquant.quality_max" class="form-control" style="width: 50px;">
+            <compression-group name="gifsicle" ng-model="compression.gifsicle">
+              <slider ng-model="compression.gifsicle.level" range="compressionOptions.gifsicle.level" name="Level"></slider>
+            </compression-group>
+
+            <compression-group name="pngquant" ng-model="compression.pngquant">
+              <slider ng-model="compression.pngquant.quality_min" range="compressionOptions.pngquant.quality_min" name="Minimum Quality"></slider>
+              <slider ng-model="compression.pngquant.quality_max" range="compressionOptions.pngquant.quality_max" name="Maximum Quality"></slider>
+              <slider ng-model="compression.pngquant.speed" range="compressionOptions.pngquant.speed" name="Speed"></slider>
+            </compression-group>
+
+
+            <compression-group name="jpegoptim" ng-model="compression.jpegoptim">
+              <slider ng-model="compression.jpegoptim.max_quality" range="compressionOptions.jpegoptim.max_quality" name="Max Quality"></slider>
+            </compression-group>
+
+            <compression-group name="jpegrecompress" ng-model="compression.jpegrecompress">
+              <slider ng-model="compression.jpegrecompress.quality" range="compressionOptions.jpegrecompress.quality" name="Level"></slider>
+            </compression-group>
+
+            <compression-group name="jpegtran" ng-model="compression.jpegtran">
+              <label>
+                Copy Chunks
+                <input type="checkbox" ng-model="compression.jpegtran.copy_chunks">
+              </label>
+              <label>
+                Progressive
+                <input type="checkbox" ng-model="compression.jpegtran.progressive">
+              </label>
+              <label>
+                JPEG Rescan
+                <input type="checkbox" ng-model="compression.jpegtran.jpegrescan">
+              </label>
+            </compression-group>
+
+            <compression-group name="optipng" ng-model="compression.optipng">
+              <slider ng-model="compression.optipng.level" range="compressionOptions.optipng.level" name="Level"></slider>
+              <label>
+                Interlace
+                <input type="checkbox" ng-model="compression.optipng.interlace">
+              </label>
+            </compression-group>
+
+            <compression-group name="pngcrush" ng-model="compression.pngcrush">
+              <select ng-model="compression.pngcrush.chunks" ng-options="option for option in compressionOptions.pngcrush.chunks"></select>
+
+              <label>
+                Fix
+                <input type="checkbox" ng-model="compression.pngcrush.fix">
+              </label>
+
+              <label>
+                Brute
+                <input type="checkbox" ng-model="compression.pngcrush.brute">
+              </label>
+
+              <label>
+                Blacken
+                <input type="checkbox" ng-model="compression.pngcrush.blacken">
+              </label>
+            </compression-group>
+
+            <compression-group name="pngout" ng-model="compression.pngout">
+              <select ng-model="compression.pngout.strategy" ng-options="value[0] as value[1] for value in compressionOptions.pngout.strategy"></select>
+
+              <label>
+                Copy Chunks
+                <input type="checkbox" ng-model="compression.pngout.copy_chunks">
+              </label>
+            </compression-group>
+
+          </form>
         </div>
       </div>
     </div>
@@ -72,11 +133,12 @@
 
           <dl ng-if="!image.original">
             <dd>Percent Savings:</dd>
-            <dt>{{image.size}}</dt> 
+            <dt>{{image.size / file.images[0].size}}</dt> 
             <dd>TIme to Compress:</dd>
             <dt>{{image.compression_time.toFixed(4)}}s</dt> 
-              
           </dl>
+
+          <button ng-click="showCompressionSettings(image)" class="btn">?</button>
 
           <button ng-click="crunch(file.images[0])"  ng-if="image.original" class="btn btn-success btn-lg btn-block">Compress Image</button>
         </div>

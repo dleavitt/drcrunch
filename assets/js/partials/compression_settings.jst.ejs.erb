@@ -1,0 +1,23 @@
+
+<dl>
+  <dd>File Size:</dd>
+  <dt>{{image.size}}</dt> 
+</dl>
+
+<dl>
+  <dd>Percent Savings:</dd>
+  <dt>{{image.size}}</dt> 
+  <dd>TIme to Compress:</dd>
+  <dt>{{image.compression_time.toFixed(4)}}s</dt> 
+</dl>
+
+<h4>Compression Settings</h4>
+<dl ng-repeat="(worker, settings) in image.compression_settings">
+  <dt>{{worker}}</dt>
+  <dd>
+    <span ng-repeat="(key, value) in settings">
+      {{key}}: {{value}}<br>
+    </span>
+  </dd>
+</dl>
+

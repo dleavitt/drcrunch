@@ -1,0 +1,9 @@
+<div class="form-group">
+  <label>
+    {{name}}
+    <input ng-model="model" type="range" min="{{range[0]}}" max="{{range[1]}}">
+  </label>
+</div>
+<div class="form-group">
+  <input type="text" ng-model="model" class="form-control number" min="{{range[0]}}" max="{{range[1]}}" readonly>
+</div>

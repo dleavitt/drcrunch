@@ -2,8 +2,23 @@ $icon-font-path: "bootstrap-sass/assets/fonts/bootstrap/";
 @import "bootstrap-sass/assets/stylesheets/_bootstrap-sprockets";
 @import "bootstrap-sass/assets/stylesheets/_bootstrap";
 
-body {
-  padding-top: 50px;
+.navbar {
+  margin: 0;
+}
+
+#forceps {
+  float: left;
+  padding: 7px 8px 4px 0;
+
+  img {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+#title {
+  line-height: 23px;
+  color: #fff;
 }
 
 .file-drop {
@@ -23,9 +38,21 @@ body {
 }
 
 .compression-form {
+  border: 1px #ddd solid;
+  border-radius: 4px;
+
   input[type=range] {
-    width: 200px;
+    // width: 200px;
   }
+
+  input.number {
+    width: 50px;
+  }
+}
+
+.compression-group {
+  margin-bottom: 0;
+  border: none;
 }
 
 .image-container {

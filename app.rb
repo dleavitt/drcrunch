@@ -84,31 +84,41 @@ class DrCrunch < Sinatra::Base
   end
 
   put '/api/images/:id/crunch' do
-    if (pngquant = params[:compression][:pngquant])
+
+    image = ImageUpload.find_by(uuid: params[:id])
+    new_image = image.make_child
+    new_image.compression_settings = params[:compression]
+
+    compression = params[:compression].deep_dup
+
+    compression.each do |worker, worker_params|
+      compression[worker] = false unless worker_params.delete('enabled')
+    end
+
+    if (pngquant = compression[:pngquant])
       if (min = pngquant.delete('quality_min')) && (max = pngquant.delete('quality_max'))
         pngquant['quality'] = (min.to_i..max.to_i)
-        params[:compression][:pngquant] = pngquant
+        compression[:pngquant] = pngquant
       end
     end
 
-    compression = params[:compression].merge(
+    compression = compression.merge(
       allow_lossy: true,
       svgo: false,
-      pngout: false,
+      verbose: true
+      # pngout: false,
     )
 
     image_optim = ImageOptim.new(compression)
 
-    image = ImageUpload.find_by(uuid: params[:id])
-    new_image = image.make_child
-
     s3_obj = image.s3_object.get
-    file = Tempfile.open(new_image.uuid) do |file|
+    Tempfile.open(new_image.uuid) do |file|
       file.write(s3_obj.body.read)
       new_image.compression_time = Benchmark.measure { image_optim.optimize_image!(file) }.real
       new_image.upload_raw(file.open.read)
     end
     new_image.save!
+
     json new_image
   end
 end
@@ -122,6 +132,7 @@ class ImageUpload
   field :extension, type: String
   field :content_length, type: Integer
   field :compression_time, type: Float
+  field :compression_settings, type: Hash
   
   field :parent_uuid, type: String
 
@@ -158,6 +169,10 @@ class ImageUpload
     s3_object.public_url
   end
 
+  def filtered_compression_settings
+    compression_settings.andand.find_all { |_, v| v['enabled'] }.to_h
+  end
+
   def to_json(args = {})
     { 
       id: uuid, 
@@ -165,6 +180,7 @@ class ImageUpload
       content_length: content_length,
       size: ActiveSupport::NumberHelper.number_to_human_size(content_length),
       compression_time: compression_time,
+      compression_settings: filtered_compression_settings,
     }.to_json
   end
 

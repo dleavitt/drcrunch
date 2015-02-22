@@ -1,0 +1,11 @@
+<div class="panel panel-default compression-group compression-{{name}}">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+      <label>
+        <input type="checkbox" ng-model="model.enabled">
+        {{name}}
+      </label>
+    </h3>
+  </div>
+  <div ng-if="model.enabled" ng-transclude class="panel-body"></div>
+</div>
