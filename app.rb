@@ -105,10 +105,10 @@ class DrCrunch < Sinatra::Base
     s3_obj = image.s3_object.get
     file = Tempfile.open(new_image.uuid) do |file|
       file.write(s3_obj.body.read)
-      image_optim.optimize_image!(file)
+      new_image.compression_time = Benchmark.measure { image_optim.optimize_image!(file) }.real
       new_image.upload_raw(file.open.read)
     end
-
+    new_image.save!
     json new_image
   end
 end
@@ -121,7 +121,7 @@ class ImageUpload
   field :content_type, type: String
   field :extension, type: String
   field :content_length, type: Integer
-  field :compression_time, type: Integer
+  field :compression_time, type: Float
   
   field :parent_uuid, type: String
 
@@ -164,6 +164,7 @@ class ImageUpload
       url: public_url,
       content_length: content_length,
       size: ActiveSupport::NumberHelper.number_to_human_size(content_length),
+      compression_time: compression_time,
     }.to_json
   end
 
