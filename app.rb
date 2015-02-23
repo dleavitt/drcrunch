@@ -74,6 +74,10 @@ class DrCrunch < Sinatra::Base
     erb :app
   end
 
+  get '/api/images/:id' do    
+    json ImageUpload.find_by(uuid: params[:id])
+  end
+
   post '/api/images' do
     
     image = ImageUpload.new
@@ -85,31 +89,11 @@ class DrCrunch < Sinatra::Base
 
   put '/api/images/:id/crunch' do
 
+    crunch = Crunch.new(settings: params[:compression])
     image = ImageUpload.find_by(uuid: params[:id])
     new_image = image.make_child
-    new_image.compression_settings = params[:compression]
-
-    compression = params[:compression].deep_dup
-
-    compression.each do |worker, worker_params|
-      compression[worker] = false unless worker_params.delete('enabled')
-    end
-
-    if (pngquant = compression[:pngquant])
-      if (min = pngquant.delete('quality_min')) && (max = pngquant.delete('quality_max'))
-        pngquant['quality'] = (min.to_i..max.to_i)
-        compression[:pngquant] = pngquant
-      end
-    end
-
-    compression = compression.merge(
-      allow_lossy: true,
-      svgo: false,
-      verbose: true
-      # pngout: false,
-    )
-
-    image_optim = ImageOptim.new(compression)
+    new_image.crunch = crunch
+    image_optim = crunch.image_optim(verbose: true)
 
     s3_obj = image.s3_object.get
     Tempfile.open(new_image.uuid) do |file|
@@ -132,9 +116,9 @@ class ImageUpload
   field :extension, type: String
   field :content_length, type: Integer
   field :compression_time, type: Float
-  field :compression_settings, type: Hash
-  
   field :parent_uuid, type: String
+
+  belongs_to :crunch
 
   def upload_from_attachment(file)
     self.extension = File.extname(file[:filename])
@@ -173,19 +157,56 @@ class ImageUpload
     compression_settings.andand.find_all { |_, v| v['enabled'] }.to_h
   end
 
-  def to_json(args = {})
+  def as_json(args = {})
     { 
       id: uuid, 
       url: public_url,
       content_length: content_length,
       size: ActiveSupport::NumberHelper.number_to_human_size(content_length),
       compression_time: compression_time,
-      compression_settings: filtered_compression_settings,
-    }.to_json
+      compression_settings: crunch,
+    }
   end
 
   def s3_object
     Aws::S3::Object.new(ENV['AWS_S3_BUCKET'], s3_key)
+  end
+end
+
+class Crunch
+  include Mongoid::Document
+  include Mongoid::Timestamps
+
+  field :name, type: String
+  field :settings, type: Hash
+
+  has_many :image_uploads
+
+  def image_optim(options)
+    compression = settings.deep_dup
+
+    compression.each do |worker, worker_params|
+      compression[worker] = false unless worker_params.delete('enabled')
+    end
+
+    if (pngquant = compression['pngquant'])
+      if (min = pngquant.delete('quality_min')) && (max = pngquant.delete('quality_max'))
+        pngquant['quality'] = (min.to_i..max.to_i)
+        compression['pngquant'] = pngquant
+      end
+    end
+
+    compression = compression.merge(
+      allow_lossy: true,
+      svgo: false
+      # pngout: false,
+    ).merge(options)
+
+    ImageOptim.new(compression)
+  end
+
+  def as_json(args = {})
+    settings.find_all { |_, v| v['enabled'] }.to_h
   end
 end
 # Dir['./lib/routes/**/*.rb'].each(&method(:require))

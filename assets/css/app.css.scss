@@ -69,3 +69,8 @@ $icon-font-path: "bootstrap-sass/assets/fonts/bootstrap/";
 .global-controls {
   margin-top: 4em;
 }
+
+.modal-backdrop.in {
+  width: 100%;
+  height: 100%;
+}

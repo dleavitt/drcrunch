@@ -1,7 +1,6 @@
-#= require angular/angular
-#= require angular-ui-bootstrap-bower/ui-bootstrap-tpls
-#= require ng-file-upload/angular-file-upload
-#= require angular-rangeslider
+#= require angular
+#= require angular-bootstrap
+#= require ng-file-upload
 
 #= require_tree ./partials
 
@@ -17,8 +16,8 @@ angular
   .controller 'AppCtrl', ($scope, $upload, $http, $modal) ->
     $scope.compression = 
       advpng:
-        enabled: false
-        level: 4
+        enabled: true
+        level: 2
       gifsicle:
         enabled: true
         level: 3
@@ -49,8 +48,8 @@ angular
         strategy: 0
       pngquant:
         enabled: true
-        quality_min: 80
-        quality_max: 90
+        quality_min: 30
+        quality_max: 70
         speed: 3
 
     $scope.compressionOptions = 
@@ -95,7 +94,6 @@ angular
       $modal.open
         controller: 'CompressionSettingsCtrl'
         templateUrl: 'compression_settings.html'
-        size: 'lg'
         resolve:
           image: -> image
 

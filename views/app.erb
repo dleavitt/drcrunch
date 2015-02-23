@@ -138,7 +138,7 @@
             <dt>{{image.compression_time.toFixed(4)}}s</dt> 
           </dl>
 
-          <button ng-click="showCompressionSettings(image)" class="btn">?</button>
+          <button ng-if="!image.original" ng-click="showCompressionSettings(image)" class="btn">?</button>
 
           <button ng-click="crunch(file.images[0])"  ng-if="image.original" class="btn btn-success btn-lg btn-block">Compress Image</button>
         </div>
